@@ -11,18 +11,39 @@ typedef struct AppData {
     cute_tiled_map_t* map;
     pntr_sound* music;
     float x, y;
+    cute_tiled_layer_t* layer;
 } AppData;
+
+void load_map(AppData* appData, char* name) {
+    char n[100];
+    sprintf(n, "assets/maps/%s.tmj", name);
+    appData->map = pntr_load_tiled(n);
+    appData->layer = pntr_tiled_layer(appData->map, name);
+
+    char* musicFile = NULL;
+
+    printf("props: %d\n",  appData->map->property_count);
+
+    if (appData->map->property_count > 0) {
+        for (int i =0;i<appData->map->property_count;i++) {
+            if (strcmp("music", appData->map->properties[i].name.ptr) == 0) {
+                sprintf(n, "assets/sounds/music-%s.ogg", (char*)appData->map->properties[i].data.string.ptr);
+                appData->music = pntr_load_sound(n);
+                pntr_play_sound(appData->music, true);
+                break;
+            }
+        }
+    }
+
+    appData->x = 0;
+    appData->y = 0;
+}
+
 
 bool Init(pntr_app* app) {
     AppData* appData = pntr_load_memory(sizeof(AppData));
     pntr_app_set_userdata(app, appData);
-
-    appData->map = pntr_load_tiled("assets/maps/SuperMarioBrosMap1-1.tmj");
-    appData->music = pntr_load_sound("assets/sounds/music-ground.ogg");
-    pntr_play_sound(appData->music, true);
-
-    appData->x = 0;
-    appData->y = 0;
+    load_map(appData, "SuperMarioBrosMap1-1");
 
     return true;
 }
