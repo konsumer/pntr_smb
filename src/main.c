@@ -6,12 +6,21 @@
 #define PNTR_TILED_IMPLEMENTATION
 #include "pntr_tiled.h"
 
+typedef enum {
+    GAME_START,
+    GAME_PLAYING,
+    GAME_OVER
+} GameState;
+
 
 typedef struct AppData {
     cute_tiled_map_t* map;
     pntr_sound* music;
     float x, y;
     cute_tiled_layer_t* layer;
+    GameState mode;
+    pntr_image* logo;
+    pntr_font* font;
 } AppData;
 
 void load_map(AppData* appData, char* name) {
@@ -19,11 +28,7 @@ void load_map(AppData* appData, char* name) {
     sprintf(n, "assets/maps/%s.tmj", name);
     appData->map = pntr_load_tiled(n);
     appData->layer = pntr_tiled_layer(appData->map, name);
-
     char* musicFile = NULL;
-
-    printf("props: %d\n",  appData->map->property_count);
-
     if (appData->map->property_count > 0) {
         for (int i =0;i<appData->map->property_count;i++) {
             if (strcmp("music", appData->map->properties[i].name.ptr) == 0) {
@@ -34,7 +39,7 @@ void load_map(AppData* appData, char* name) {
             }
         }
     }
-
+    appData->mode = GAME_PLAYING;
     appData->x = 0;
     appData->y = 0;
 }
@@ -44,7 +49,9 @@ bool Init(pntr_app* app) {
     AppData* appData = pntr_load_memory(sizeof(AppData));
     pntr_app_set_userdata(app, appData);
     load_map(appData, "SuperMarioBrosMap1-1");
-
+    appData->mode = GAME_START;
+    appData->logo = pntr_load_image("assets/logo.png");
+    appData->font = pntr_load_font_tty("assets/font.png", 16, 15, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-\",.!: ");
     return true;
 }
 
@@ -69,14 +76,17 @@ bool Update(pntr_app* app, pntr_image* screen) {
     pntr_clear_background(screen, PNTR_BLACK);
     pntr_draw_tiled(screen, appData->map, appData->x, appData->y, PNTR_WHITE);
 
+    if (appData->mode == GAME_START) {
+        pntr_draw_image(app->screen, appData->logo, 64, 48);
+        pntr_draw_text(app->screen,appData->font, "PRESS START\n\n TO BEGIN!", 65, 145, PNTR_WHITE);
+    }
+
     return true;
 }
 
 void Close(pntr_app* app) {
     AppData* appData = (AppData*)pntr_app_userdata(app);
-
     pntr_unload_tiled(appData->map);
-
     pntr_unload_memory(appData);
 }
 
