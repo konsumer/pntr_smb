@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/x-icon" href="https://avatars.githubusercontent.com/u/83857" />
+	<title>SMB</title>
+	<style type="text/css">
+		body {
+			margin: 0;
+			background: black;
+			color: white;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 100vh;
+		}
+		canvas {
+			flex: 1;
+			max-width: 100vw;
+		}
+	</style>
+</head>
+<body>
+
+<canvas id="screen"></canvas>
+
+<script type="module">
+import setup from './smb.mjs'
+await setup({canvas: document.getElementById('screen')}) 
+</script>
+
+</body>
+</html>

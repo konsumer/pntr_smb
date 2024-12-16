@@ -1,0 +1,13 @@
+{
+    "scripts": {
+        "start": "npx -y npm-run-all -p watch:web start:web",
+        "start:web": "npx -y live-server docs",
+        "build:web": "emcmake cmake -B wbuild -G Ninja && cmake --build wbuild --target smb",
+        "watch:web": "npx -y nodemon -w assets -w src -e 'c h png ogg tmj' --exec 'npm run build:web'",
+
+        "build:raylib": "cmake -B build -G Ninja -D PNTR_APP_BUILD_TEST=OFF && cmake --build build --target smb",
+        "build:retro": "cmake -B build -G Ninja && cmake --build build --target smb-libretro",
+
+        "clean": "rm -rf build wbuild docs/*.mjs docs/*.wasm"
+    }
+}
