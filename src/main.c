@@ -21,13 +21,16 @@ typedef struct AppData {
     GameState mode;
     pntr_image* logo;
     pntr_font* font;
+    char* worldText;
 } AppData;
 
 void load_map(AppData* appData, char* name) {
     char n[100];
-    sprintf(n, "assets/maps/%s.tmj", name);
+    sprintf(n, "assets/maps/SuperMarioBrosMap%s.tmj", name);
     appData->map = pntr_load_tiled(n);
-    appData->layer = pntr_tiled_layer(appData->map, name);
+    sprintf(n, "SuperMarioBrosMap%s", name);
+    appData->layer = pntr_tiled_layer(appData->map, n);
+    appData->worldText = name;
     char* musicFile = NULL;
     if (appData->map->property_count > 0) {
         for (int i =0;i<appData->map->property_count;i++) {
@@ -48,10 +51,10 @@ void load_map(AppData* appData, char* name) {
 bool Init(pntr_app* app) {
     AppData* appData = pntr_load_memory(sizeof(AppData));
     pntr_app_set_userdata(app, appData);
-    load_map(appData, "SuperMarioBrosMap1-1");
+    load_map(appData, "1-1");
     appData->mode = GAME_START;
     appData->logo = pntr_load_image("assets/logo.png");
-    appData->font = pntr_load_font_tty("assets/font.png", 16, 15, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-\",.!: ");
+    appData->font = pntr_load_font_tty("assets/font.png", 8, 14, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-\",.!: ");
     return true;
 }
 
@@ -78,8 +81,12 @@ bool Update(pntr_app* app, pntr_image* screen) {
 
     if (appData->mode == GAME_START) {
         pntr_draw_image(app->screen, appData->logo, 64, 48);
-        pntr_draw_text(app->screen,appData->font, "PRESS START\n\n TO BEGIN!", 65, 145, PNTR_WHITE);
+        pntr_draw_text(app->screen,appData->font, "PRESS A KEY\n TO BEGIN!", 110, 160, PNTR_WHITE);
+    } else {
+        pntr_draw_text(app->screen,appData->font, appData->worldText, 2, 2, PNTR_WHITE);    
     }
+
+
 
     return true;
 }
